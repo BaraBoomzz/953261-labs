@@ -76,25 +76,23 @@ export function averageOrder(orders, menu) {
 
 // Task 9 — return the NAME of the item with the highest total quantity sold.
 export function bestSeller(orders, menu) {
-  // 1. นำจำนวนที่ขายได้ของทุกออเดอร์มารวมกันตาม menuId
+  // 1. รวมจำนวนยอดขายของแต่ละ menuId
   const qtyMap = orders.reduce((acc, order) => {
-    order.items.forEach((item) => {
-      acc[item.menuId] = (acc[item.menuId] || 0) + item.qty;
+    order.items.forEach((line) => {
+      acc[line.menuId] = (acc[line.menuId] || 0) + line.qty;
     });
     return acc;
   }, {});
 
-  // 2. หา menuId ที่มีจำนวนขายสูงสุด
-  let topMenuId = null;
-  let maxQty = 0;
-  for (const [menuId, qty] of Object.entries(qtyMap)) {
-    if (qty > maxQty) {
-      maxQty = qty;
-      topMenuId = menuId;
+  // 2. หา menuId ที่มียอดขายสูงสุดโดยไม่ใช้ for loop
+  const topMenuId = Object.keys(qtyMap).reduce((bestId, currentId) => {
+    if (!bestId || qtyMap[currentId] > qtyMap[bestId]) {
+      return currentId;
     }
-  }
+    return bestId;
+  }, null);
 
-  // 3. คืนค่าชื่อเมนู
+  // 3. ค้นหาและคืนค่าชื่อเมนู
   const topItem = findItem(menu, topMenuId);
   return topItem ? topItem.name : undefined;
 }
@@ -109,4 +107,10 @@ export function namesByCategory(menu) {
     acc[item.category].push(item.name);
     return acc;
   }, {});
+}
+// Part D — Custom Function
+export function itemsWithTag(menu, tag) {
+  return menu
+    .filter((item) => item.tags.includes(tag))
+    .map((item) => item.name);
 }
